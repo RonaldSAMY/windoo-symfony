@@ -27,10 +27,16 @@ class Vote
     private $contre;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Idea", inversedBy="vote", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity="App\Entity\Idea", inversedBy="vote")
      * @ORM\JoinColumn(nullable=false)
      */
     private $idea;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="vote")
+     */
+    private $user;
+
 
     public function getId(): ?int
     {
@@ -69,6 +75,18 @@ class Vote
     public function setIdea(Idea $idea): self
     {
         $this->idea = $idea;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

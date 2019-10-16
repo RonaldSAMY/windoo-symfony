@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -27,9 +29,22 @@ class Idea
     private $dateCreation;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Vote", mappedBy="idea", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="App\Entity\Vote", mappedBy="idea", orphanRemoval=true)
      */
     private $vote;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="ideas")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $client;
+
+    public function __construct()
+    {
+        $this->vote = new ArrayCollection();
+    }
+
+
 
     public function getId(): ?int
     {
@@ -73,6 +88,41 @@ class Idea
         if ($this !== $vote->getIdea()) {
             $vote->setIdea($this);
         }
+
+        return $this;
+    }
+
+    public function addVote(Vote $vote): self
+    {
+        if (!$this->vote->contains($vote)) {
+            $this->vote[] = $vote;
+            $vote->setIdea($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVote(Vote $vote): self
+    {
+        if ($this->vote->contains($vote)) {
+            $this->vote->removeElement($vote);
+            // set the owning side to null (unless already changed)
+            if ($vote->getIdea() === $this) {
+                $vote->setIdea(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getClient(): ?User
+    {
+        return $this->client;
+    }
+
+    public function setClient(?User $client): self
+    {
+        $this->client = $client;
 
         return $this;
     }
