@@ -28,10 +28,6 @@ class Idea
      */
     private $dateCreation;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Vote", mappedBy="idea", orphanRemoval=true)
-     */
-    private $vote;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="ideas")
@@ -75,46 +71,6 @@ class Idea
         return $this;
     }
 
-    public function getVote(): ?Vote
-    {
-        return $this->vote;
-    }
-
-    public function setVote(Vote $vote): self
-    {
-        $this->vote = $vote;
-
-        // set the owning side of the relation if necessary
-        if ($this !== $vote->getIdea()) {
-            $vote->setIdea($this);
-        }
-
-        return $this;
-    }
-
-    public function addVote(Vote $vote): self
-    {
-        if (!$this->vote->contains($vote)) {
-            $this->vote[] = $vote;
-            $vote->setIdea($this);
-        }
-
-        return $this;
-    }
-
-    public function removeVote(Vote $vote): self
-    {
-        if ($this->vote->contains($vote)) {
-            $this->vote->removeElement($vote);
-            // set the owning side to null (unless already changed)
-            if ($vote->getIdea() === $this) {
-                $vote->setIdea(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getClient(): ?User
     {
         return $this->client;
@@ -125,5 +81,10 @@ class Idea
         $this->client = $client;
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return (string) $this->id;
     }
 }

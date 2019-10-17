@@ -10,17 +10,21 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class IdeaController extends AbstractController
 {
+    private $loSerializer;
     /**
      * @var EntityManagerInterface $em
      */
     private $em;
 
-    public function __construct(EntityManagerInterface $poEm)
+    public function __construct(EntityManagerInterface $poEm,SerializerInterface $poSerializer)
     {
         $this->em = $poEm;
+        $this->loSerializer = $poSerializer;
     }
 
     /**
@@ -31,7 +35,7 @@ class IdeaController extends AbstractController
         $loIdeaRepo = $this->em->getRepository(Idea::class);
         $laIdeas = $loIdeaRepo->findAll();
 
-        return new JsonResponse($laIdeas,Response::HTTP_OK);
+        return new Response($this->loSerializer->serialize($laIdeas,'json'),Response::HTTP_OK);
     }
 
     /**
@@ -44,9 +48,10 @@ class IdeaController extends AbstractController
         $laFormResult = json_decode($poRequest->getContent(),true);
         $loForm->submit($laFormResult);
         $loIdea->setDateCreation(new \DateTime('now'));
+        $loIdea->setClient($this->getUser());
         $this->em->persist($loIdea);
         $this->em->flush();
-        return New JsonResponse($loIdea,Response::HTTP_CREATED);
+        return New Response($this->loSerializer->serialize($loIdea,'json'),Response::HTTP_CREATED);
     }
 
     /**

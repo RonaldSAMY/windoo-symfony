@@ -15,10 +15,9 @@ class UserFixtures extends Fixture
             $loUser = new User();
             $loUser->setUsername('test_'.$i.'@mail.com');
             $loUser->setPassword('test_'.$i);
-            $loUser->setRoles(['USER']);
+            $loUser->setRoles(['ROLE_USER']);
             $manager->persist($loUser);
             $manager->flush();
-            var_dump($loUser);
         }
         // $product = new Product();clear
         // $manager->persist($product);
